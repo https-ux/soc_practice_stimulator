@@ -1,2 +1,10 @@
 # soc_practice_stimulator
-helps in analyzing the logs for cybersecurity-soc analyst
+test your skills @this 
+
+#for cybersecurity-soc analyst
+
+
+#desktop/laptop users   #download the file and run in browser 
+
+
+#phone users    # download the file and run in browser switch to desktop version
