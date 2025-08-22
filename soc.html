@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+    <title>SOC Analyst Training Simulator</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --gray: #7f8c8d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(44, 62, 80, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--primary);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--secondary);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--light);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            display: flex;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: rgba(26, 42, 58, 0.9);
+            padding: 20px;
+            border-right: 2px solid var(--secondary);
+        }
+
+        .scenario-list {
+            list-style: none;
+            max-height: 500px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 15;
+        }
+
+        .scenario-item {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: rgba(52, 152, 219, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+            font-size: 1.1rem;
+        }
+
+        .scenario-item:hover {
+            background: rgba(52, 152, 219, 0.4);
+            transform: translateX(5px);
+        }
+
+        .scenario-item.active {
+            background: var(--secondary);
+            font-weight: bold;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .scenario-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .scenario-title {
+            font-size: 1.6rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .scenario-description {
+            color: var(--light);
+            font-size: 1.1rem;
+        }
+
+        .logs-container {
+            background: #1a2a3a;
+            border: 1px solid #34495e;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            flex: 1;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 250px;
+        }
+
+        .question-container {
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--light);
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option {
+            padding: 15px;
+            background: rgba(52, 152, 219, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: rgba(52, 152, 219, 0.4);
+        }
+
+        .option.selected {
+            background: var(--secondary);
+            font-weight: bold;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--gray);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #636e72;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent);
+            padding: 10px 15px;
+            background: rgba(231, 76, 60, 0.2);
+            border-radius: 5px;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(46, 204, 113, 0.2);
+            border-radius: 5px;
+        }
+
+        .feedback {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: rgba(46, 204, 113, 0.2);
+            border-left: 5px solid var(--success);
+        }
+
+        .feedback.incorrect {
+            background: rgba(231, 76, 60, 0.2);
+            border-left: 5px solid var(--danger);
+        }
+
+        .scenario-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .tag-l1 {
+            background: var(--success);
+        }
+
+        .tag-l2 {
+            background: var(--warning);
+        }
+
+        .tag-l3 {
+            background: var(--danger);
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid var(--secondary);
+            }
+
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>SOC Analyst Training Simulator</h1>
+            <p class="subtitle">Test your cybersecurity skills with realistic scenarios</p>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>Scenarios</h3>
+                <ul class="scenario-list" id="scenario-list">
+                    <!-- Scenarios will be populated by JavaScript -->
+                </ul>
+            </div>
+
+            <div class="content-area">
+                <div class="scenario-header">
+                    <h2 class="scenario-title" id="scenario-title">Select a scenario to begin</h2>
+                    <p class="scenario-description" id="scenario-description">Choose from the list of scenarios on the left to start your training.</p>
+                </div>
+
+                <div class="logs-container" id="logs-container">
+                    // Logs will appear here once a scenario is selected
+                </div>
+
+                <div class="question-container">
+                    <h3 class="question-text" id="question-text">Please select a scenario to view questions</h3>
+
+                    <div class="options-container" id="options-container">
+                        <!-- Options will be populated by JavaScript -->
+                    </div>
+
+                    <div class="feedback" id="feedback">
+                        <!-- Feedback will be shown here -->
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn-secondary" id="prev-btn" disabled>Previous</button>
+                    <div class="timer" id="timer">Time: 05:00</div>
+                    <button class="btn-primary" id="next-btn" disabled>Next Question</button>
+                    <button class="btn-success" id="submit-btn" style="display: none;">Submit Answer</button>
+                </div>
+
+                <div class="score-display" id="score-display" style="display: none;">
+                    Your Score: <span id="score">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scenario data - 10 sample scenarios
+        const scenarios = [
+            {
+                id: 1,
+                title: "Phishing Email Analysis",
+                difficulty: "L1",
+                description: "Analyze a suspicious email reported by an employee.",
+                logs: `Email Headers:
+From: "Amazon Security" <security@amazon-support.com>
+To: john.employee@yourcompany.com
+Subject: Urgent: Your Amazon Account is Locked
+Date: Tue, 17 Oct 2023 14:22:15 -0700
+Return-Path: <bounce-handler@mail-relay.net>
+Received: from mail-relay.net (mail-relay.net [192.0.2.100])
+        by yourcompany-mailserver.com with SMTP
+
+Email Body:
+Hello John, suspicious activity was detected on your Amazon account.
+Click here to verify your identity: http://amazon-security-verify.com/account?id=12345
+
+Proxy Log:
+2023-10-17 14:25:02 | john.employee | 10.10.1.45 | GET | http://amazon-security-verify.com/account?id=12345 | 403 Forbidden (Blocked by Cisco Umbrella)
+
+EDR Log:
+2023-10-17 14:25:05 | Host: JOHN-DESKTOP | User: john.employee | Process: chrome.exe | Action: Attempted write to C:\\\\Users\\\\john.employee\\\\AppData\\\\Local\\\\Temp\\\\amazon_verify.exe | Result: Blocked (Signature: Gen:Variant.Zusy.123456)`,
+                questions: [
+                    {
+                        question: "What is the most immediate Indicator of Compromise (IOC) in this email?",
+                        options: [
+                            "The sender's display name",
+                            "The subject line urgency",
+                            "The URL in the email body",
+                            "The date of the email"
+                        ],
+                        correctAnswer: 2,
+                        feedback: "Correct! The URL (http://amazon-security-verify.com) is a known malicious domain and the primary IOC."
+                    },
+                    {
+                        question: "Was the user's computer compromised?",
+                        options: [
+                            "Yes, the malware executed successfully",
+                            "No, both the proxy and EDR blocked the activity",
+                            "Yes, but the malware was contained",
+                            "Unable to determine from the logs"
+                        ],
+                        correctAnswer: 1,
+                        feedback: "Correct! The proxy log shows the request was blocked, and the EDR log shows the file write was also blocked."
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "SSH Brute Force Attack",
+                difficulty: "L2",
+                description: "Investigate multiple failed SSH login attempts to a web server.",
+                logs: `Firewall Logs:
+2023-10-17 03:15:12 | SRC: 198.51.100.55 | DST: 203.0.113.10:22 | PROTO: TCP | ACTION: Deny
+2023-10-17 03:15:13 | SRC: 198.51.100.55 | DST: 203.0.113.10:22 | PROTO: TCP | ACTION: Deny
+... (20 identical lines in a 5-second period) ...
+2023-10-17 03:15:38 | SRC: 198.51.100.55 | DST: 203.0.113.10:22 | PROTO: TCP | ACTION: Deny
+2023-10-17 03:16:01 | SRC: 198.51.100.55 | DST: 203.0.113.10:443 | PROTO: TCP | ACTION: Deny
+
+SIEM Alert: "Multiple Failed SSH Login Attempts"
+
+Asset Database Info: 
+203.0.113.10 = linux-webserver-01 (Ubuntu 20.04), owned by Web Team.`,
+                questions: [
+                    {
+                        question: "What service is being targeted in this attack?",
+                        options: [
+                            "HTTP Web Server",
+                            "SSH (Secure Shell)",
+                            "DNS Server",
+                            "RDP (Remote Desktop)"
+                        ],
+                        correctAnswer: 1,
+                        feedback: "Correct! The attacks are targeting port 22, which is the default port for SSH."
+                    },
+                    {
+                        question: "What is the source IP address of the attacker?",
+                        options: [
+                            "203.0.113.10",
+                            "198.51.100.55",
+                            "10.10.1.45",
+                            "192.0.2.100"
+                        ],
+                        correctAnswer: 1,
+                        feedback: "Correct! The source IP in the firewall logs is 198.51.100.55."
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Malware Execution Detection",
+                difficulty: "L2",
+                description: "Analyze possible malware execution on an endpoint.",
+                logs: `EDR Alert: "Suspicious Process Execution"
+Host: FINANCE-PC-12
+User: alice.finance
+Process: C:\\\\Windows\\\\Temp\\\\tmpAB1234.exe
+Parent Process: C:\\\\Program Files (x86)\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe
+Command Line: "C:\\\\Windows\\\\Temp\\\\tmpAB1234.exe" /silent /install
+
+Network Connection:
+Destination IP: 185.243.115.94 | Port: 443 | Protocol: TCP
+
+File Activities:
+Created: C:\\\\Users\\\\alice.finance\\\\AppData\\\\Local\\\\Temp\\\\config.bin
+Modified: C:\\\\Users\\\\alice.finance\\\\AppData\\\\Roaming\\\\Microsoft\\\\Windows\\\\Start Menu\\\\Programs\\\\Startup\\\\update_checker.vbs
+
+Registry Modification:
+HKEY_CURRENT_USER\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run - Added: "SystemUpdate" = "C:\\\\Users\\\\alice.finance\\\\AppData\\\\Local\\\\Temp\\\\tmpAB1234.exe"`,
+                questions: [
+                    {
+                        question: "What persistence mechanism did the malware establish?",
+                        options: [
+                            "Scheduled Task",
+                            "Registry Run Key",
+                            "Service Creation",
+                            "Browser Extension"
+                        ],
+                        correctAnswer: 1,
+                        feedback: "Correct! The malware added an entry to the HKEY_CURRENT_USER\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run registry key."
+                    },
+                    {
+                        question: "Which indicator suggests possible data exfiltration?",
+                        options: [
+                            "The parent process is Chrome",
+                            "The file creation in Temp folder",
+                            "The network connection to 185.243.115.94:443",
+                            "The command line arguments"
+                        ],
+                        correctAnswer: 2,
+                        feedback: "Correct! The outbound connection to an external IP on port 443 (HTTPS) is a common exfiltration technique."
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "Data Exfiltration Attempt",
+                difficulty: "L3",
+                description: "Investigate potential data exfiltration via DNS tunneling.",
+                logs: `DNS Query Logs:
+2023-10-18 09:12:34 | Host: RESEARCH-PC-07 | Query: 8d7f1a9c2e4b0d3f.example.com | Type: AAAA | Result: NXDOMAIN
+2023-10-18 09:12:35 | Host: RESEARCH-PC-07 | Query: f3e4b0d3f8d7f1a9.example.com | Type: AAAA | Result: NXDOMAIN
+2023-10-18 09:12:36 | Host: RESEARCH-PC-07 | Query: c2e4b0d3f8d7f1a9.example.com | Type: AAAA | Result: NXDOMAIN
+... (hundreds of similar queries over 10 minutes) ...
+
+Network Traffic:
+Host: RESEARCH-PC-07 | Protocol: DNS | Volume: 15.7 MB over 10 minutes | Destination: 8.8.8.8
+
+EDR Context:
+Process: cmd.exe | User: james.researcher | Command: nslookup 8d7f1a9c2e4b0d3f.example.com
+
+Data Classification:
+Research-PC-07 contains files marked as "Confidential Research Data"`,
+                questions: [
+                    {
+                        question: "What technique is being used for data exfiltration?",
+                        options: [
+                            "HTTP POST requests",
+                            "FTP transfer",
+                            "DNS tunneling",
+                            "ICMP tunneling"
+                        ],
+                        correctAnswer: 2,
+                        feedback: "Correct! The pattern of unusual DNS queries with encoded subdomains is characteristic of DNS tunneling."
+                    },
+                    {
+                        question: "What would be the most appropriate immediate response?",
+                        options: [
+                            "Monitor the activity for further analysis",
+                            "Disable the network interface on RESEARCH-PC-07",
+                            "Block all outbound DNS traffic",
+                            "Confront the user about their activity"
+                        ],
+                        correctAnswer: 1,
+                        feedback: "Correct! Isolating the host is the most appropriate immediate action to prevent further data exfiltration while investigation continues."
+                    }
+                ]
+            },
+            {
+                id: 5,
+                title: "Cloud Storage Misconfiguration",
+                difficulty: "L1",
+                description: "Identify misconfigured cloud storage exposing sensitive data.",
+                logs: `Cloud Security Alert: "Publicly Accessible S3 Bucket"
+Bucket Name: yourcompany-customer-data
+Region: us-west-2
+Owner: marketing-department
+Access: Public (List and Read for Everyone)
+Contents: 
+- /incoming/customer_uploads/*.csv (1,245 files)
+- /processed/customer_profiles/*.json (578 files)
+
+Data Classification:
+Files contain PII: Names, Email Addresses, Phone Numbers
+
+Access Logs (last 24 hours):
+185.243.115.94 - [18/Oct/2023:02:43:12] GET /incoming/customer_uploads/data_1001.csv
+203.0.113.23 - [18/Oct/2023:03:12:47] GET /processed/customer_profiles/profile_4823.json
+198.51.100.89 - [18/Oct/2023:04:56:33] LIST /incoming/customer_uploads/`,
+                questions: [
+                    {
+                        question: "What is the primary security issue with this S3 bucket?",
+                        options: [
+                            "It contains too much data",
+                            "It's located in the wrong region",
+                            "It's publicly accessible with read permissions",
+                            "The owner is incorrectly set"
+                        ],
+                        correctAnswer: 2,
+                        feedback: "Correct! The bucket is publicly accessible with list and read permissions for everyone, exposing sensitive customer data."
+                    },
+                    {
+                        question: "Which type of data exposure is most critical in this case?",
+                        options: [
+                            "Financial records",
+                            "Intellectual property",
+                            "Personally Identifiable Information (PII)",
+                            "System configuration files"
+                        ],
+                        correctAnswer: 2,
+                        feedback: "Correct! The exposed data contains PII (Names, Email Addresses, Phone Numbers) which is highly sensitive and regulated."
+                    }
+                ]
+            },
+            {
+                id: 6,
+                title: "Insider Threat Detection",
+                difficulty: "L3",
+                description: "Identify potential insider data theft by a departing employee.",
+                logs: `File Access Logs:
+2023-10-19 08:15:23 | User: sarah.dev | File: //repo01/projects/future_product/specs.docx | Action: READ
+2023-10-19 08:17:45 | User: sarah.dev | File: //repo01/projects/future_product/design.pptx | Action: READ
+2023-10-19 08:20:12 | User: sarah.dev | File: //repo01/projects/future_product/roadmap.xlsx | Action: READ
+
+USB Device Logs:
+2023-10-19 08:22:34 | Host: DEV-PC-08 | User: sarah.dev | Device: SanDisk Cruzer 64GB | Action: Connected
+2023-10-19 08:25:17 | Host: DEV-PC-08 | User: sarah.dev | File: C:\\\\Users\\\\sarah.dev\\\\Downloads\\\\temp.zip | Action: COPIED
+
+HR Notification:
+User: Sarah Johnson (sarah.dev)
+Status: Resignation submitted, last day: 2023-10-20
+Role: Senior Product Developer
+Access: Proprietary product development materials`,
+                questions: [
+                    {
+                        question: "What combination of activities suggests potential data exfiltration?",
+                        options: [
+                            "Accessing files and connecting a USB device",
+                            "Reading documents and creating a ZIP file",
+                            "Accessing multiple files and then copying to removable media",
+                            "Downloading files and resigning from the company"
+                        ],
+                        correctAnswer: 2,
+                        feedback: "Correct! The pattern of accessing multiple sensitive files followed by copying a ZIP file to a USB device is highly suspicious, especially for a departing employee."
+                    },
+                    {
+                        question: "What would be the most appropriate immediate action?",
+                        options: [
+                            "Confront the employee immediately",
+                            "Disable the user's account and preserve evidence",
+                            "Monitor the activity for more evidence",
+                            "Report to HR for policy violation"
+                        ],
+                        correctAnswer: 1,
+                        feedback: "Correct! The most appropriate action is to disable the account to prevent further potential data loss while preserving evidence for investigation."
+                    }
+                ]
+            },
+            {
+                id: 7,
+                title: "Ransomware Infection",
+                difficulty: "L2",
+                description: "Respond to a potential ransomware infection on a network share.",
+                logs: `Endpoint Detection Alert:
+Host: SALES-PC-03 | Process: C:\\\\Windows\\\\Temp\\\\encryptor.exe | Signature: Ransom.WannaCry
+
+File Server Alert:
+\\\\fileserver\\\\shared_drive\\\\sales_data\\\\*.* - Multiple files renamed with .crypted extension
+
+Network Connections:
+SALES-PC-03 -> FILESERVER (SMB) - Large volume of write operations
+
+Security Tool Log:
+Windows Defender detected and quarantined encryptor.exe but not before some files were encrypted
+
+User Report:
+User: bob.sales - "I can't open my sales reports, they have strange extensions"`,
+                questions: [
+                    {
+                        question: "What is the primary indicator of ransomware activity?",
+                        options: [
+                            "The process name encryptor.exe",
+                            "Files being renamed with new extensions",
+                            "Large volume of SMB write operations",
+                            "All of the above"
+                        ],
+                        correctAnswer: 3,
+                        feedback: "Correct! All these indicators together confirm ransomware activity: suspicious process, file extensions changing, and unusual file operations."
+                    },
+                    {
+                        question: "What should be the first containment step?",
+                        options: [
+                            "Disconnect the affected PC from the network",
+                            "Restore files from backup",
+                            "Run antivirus scan on all computers",
+                            "Shut down the file server"
+                        ],
+                        correctAnswer: 0,
+                        feedback: "Correct! The first priority is to isolate the affected PC to prevent the ransomware from spreading to other systems."
+                    }
+                ]
+            },
+            {
+                id: 8,
+                title: "DDoS Attack Mitigation",
+                difficulty: "L2",
+                description: "Respond to a distributed denial of service attack on web servers.",
+                logs: `Network Monitoring Alert:
+Inbound traffic to web farm increased by 1200% in 5 minutes
+
+Traffic Analysis:
+Source IPs: 2,400+ unique IP addresses, mostly from overseas cloud providers
+Protocol: HTTP/HTTPS (Port 80/443)
+Pattern: GET requests for /wp-admin, /phpmyadmin, /api/login
+
+Web Server Performance:
+CPU: 98-100% utilization across all web servers
+Response Time: Increased from 200ms to 15+ seconds
+Error Rate: 45% HTTP 503 errors
+
+CDN Logs:
+Cloudflare reporting 850,000 requests in last 10 minutes (normal: 15,000)`,
+                questions: [
+                    {
+                        question: "What type of DDoS attack is this most likely to be?",
+                        options: [
+                            "Volumetric attack",
+                            "Protocol attack",
+                            "Application layer attack",
+                            "SSL exhaustion attack"
+                        ],
+                        correctAnswer: 2,
+                        feedback: "Correct! The pattern of HTTP requests targeting specific endpoints suggests an application layer (Layer 7) attack."
+                    },
+                    {
+                        question: "What is the most effective immediate mitigation strategy?",
+                        options: [
+                            "Block all overseas IP addresses",
+                            "Scale up server capacity",
+                            "Enable CDN DDoS protection",
+                            "Restart the web servers"
+                        ],
+                        correctAnswer: 2,
+                        feedback: "Correct! Enabling the CDN's DDoS protection features is the most effective immediate response as CDNs are designed to absorb and filter such attacks."
+                    }
+                ]
+            },
+            {
+                id: 9,
+                title: "Privilege Escalation Attempt",
+                difficulty: "L3",
+                description: "Investigate potential privilege escalation on a Linux server.",
+                logs: `Linux Server Logs:
+Oct 19 11:23:12 web01 sudo: pam_unix(sudo:auth): authentication failure; logname= uid=1002 euid=0 tty=/dev/pts/0 ruser=webadmin rhost=::1
+Oct 19 11:23:14 web01 sudo: pam_unix(sudo:auth): authentication failure; logname= uid=1002 euid=0 tty=/dev/pts/0 ruser=webadmin rhost=::1
+Oct 19 11:23:16 web01 sudo: pam_unix(sudo:auth): authentication failure; logname= uid=1002 euid=0 tty=/dev/pts/0 ruser=webadmin rhost=::1
+
+Process Monitoring:
+webadmin user attempted to run: sudo su -
+webadmin user attempted to run: sudo passwd root
+
+Account Information:
+User: webadmin (UID: 1002) - Web application service account
+SSH Login: 10.10.2.15 (Developer PC) at 11:20:32
+
+Cron Job Modification:
+/etc/cron.d/daily_maintenance - Added line: * * * * * webadmin /tmp/update_system.sh`,
+                questions: [
+                    {
+                        question: "What two privilege escalation techniques are being attempted?",
+                        options: [
+                            "SUDO brute force and cron job manipulation",
+                            "Kernel exploit and service abuse",
+                            "SUID exploitation and password cracking",
+                            "SSH key manipulation and service restart"
+                        ],
+                        correctAnswer: 0,
+                        feedback: "Correct! The logs show multiple failed sudo attempts followed by a cron job modification - two common privilege escalation techniques."
+                    },
+                    {
+                        question: "What evidence suggests the account may be compromised?",
+                        options: [
+                            "The UID value of 1002",
+                            "The SSH login from a developer PC",
+                            "The authentication failures from ::1 (local)",
+                            "The attempt to change the root password"
+                        ],
+                        correctAnswer: 2,
+                        feedback: "Correct! The authentication failures from ::1 (localhost) suggest someone already has access to the system and is trying to elevate privileges from within."
+                    }
+                ]
+            },
+            {
+                id: 10,
+                title: "Supply Chain Compromise",
+                difficulty: "L3",
+                description: "Investigate a potential software supply chain attack.",
+                logs: `Network Monitoring Alert:
+Dev workstations downloading from unusual npm repository: registry.unknown-packages.com
+
+Package Analysis:
+Library: financial-charts-utils (version 3.2.11)
+Dependencies: Includes obfuscated minified JS file: security-check.js
+Behavior: Attempts to exfiltrate AWS credentials to dns.exfiltrate[.]site
+
+Developer Reports:
+Multiple developers reporting authentication issues with AWS services
+
+CI/CD Pipeline:
+Build server detected pushing modified containers to production registry
+
+CloudTrail Logs:
+Unauthorized API calls from developer AWS credentials to create new IAM users`,
+                questions: [
+                    {
+                        question: "What is the initial infection vector in this attack?",
+                        options: [
+                            "Phishing email",
+                            "Compiled dependency",
+                            "Weak AWS credentials",
+                            "Unpatched vulnerability"
+                        ],
+                        correctAnswer: 1,
+                        feedback: "Correct! The attack began with a compromised npm package (financial-charts-utils) that contained malicious code."
+                    },
+                    {
+                        question: "What is the primary goal of this attack?",
+                        options: [
+                            "Data destruction",
+                            "Cryptocurrency mining",
+                            "Credential theft and cloud access",
+                            "Espionage"
+                        ],
+                        correctAnswer: 2,
+                        feedback: "Correct! The malware is designed to steal AWS credentials and create unauthorized IAM users, indicating the goal is persistent cloud access."
+                    }
+                ]
+            }
+        ];
+
+        // Application state
+        let currentScenarioIndex = 0;
+        let currentQuestionIndex = 0;
+        let userScore = 0;
+        let selectedOption = null;
+        let timeLeft = 300; // 5 minutes in seconds
+        let timerInterval = null;
+
+        // DOM elements
+        const scenarioList = document.getElementById('scenario-list');
+        const scenarioTitle = document.getElementById('scenario-title');
+        const scenarioDescription = document.getElementById('scenario-description');
+        const logsContainer = document.getElementById('logs-container');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackEl = document.getElementById('feedback');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const timerEl = document.getElementById('timer');
+        const scoreDisplay = document.getElementById('score-display');
+        const scoreEl = document.getElementById('score');
+
+        // Initialize the application
+        function init() {
+            if (!scenarioList || !scenarioTitle || !scenarioDescription || !logsContainer || !questionText || !optionsContainer || !feedbackEl || !prevBtn || !nextBtn || !submitBtn || !timerEl || !scoreDisplay || !scoreEl) {
+                console.error('Error: One or more DOM elements not found');
+                return;
+            }
+            populateScenarioList();
+            setupEventListeners();
+            updateTimerDisplay();
+        }
+
+        // Populate the scenario list
+        function populateScenarioList() {
+            if (!scenarioList) {
+                console.error('Error: scenario-list element not found');
+                return;
+            }
+            scenarios.forEach((scenario, index) => {
+                const li = document.createElement('li');
+                li.className = 'scenario-item';
+                li.innerHTML = `${scenario.title} <span class="scenario-tag tag-${scenario.difficulty.toLowerCase()}">${scenario.difficulty}</span>`;
+                li.dataset.index = index;
+                li.addEventListener('click', function () {
+                    console.log('Clicked scenario:', scenario.title, 'Index:', index);
+                    selectScenario(parseInt(this.dataset.index));
+                });
+                li.addEventListener('touchstart', function (e) {
+                    e.preventDefault();
+                    console.log('Touched scenario:', scenario.title, 'Index:', index);
+                    selectScenario(parseInt(this.dataset.index));
+                });
+                scenarioList.appendChild(li);
+            });
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            prevBtn.addEventListener('click', goToPreviousQuestion);
+            nextBtn.addEventListener('click', goToNextQuestion);
+            submitBtn.addEventListener('click', checkAnswer);
+            optionsContainer.addEventListener('click', function (e) {
+                if (e.target.classList.contains('option')) {
+                    selectOption(parseInt(e.target.dataset.index));
+                }
+            });
+        }
+
+        // Select a scenario
+        function selectScenario(index) {
+            console.log('selectScenario running for index:', index);
+            if (!scenarios[index]) {
+                console.error('Error: Invalid scenario index', index);
+                return;
+            }
+            currentScenarioIndex = index;
+            currentQuestionIndex = 0;
+            userScore = 0;
+
+            const scenario = scenarios[index];
+            if (!scenarioTitle || !scenarioDescription || !logsContainer) {
+                console.error('Error: One or more DOM elements not found');
+                return;
+            }
+
+            scenarioTitle.textContent = scenario.title;
+            scenarioDescription.textContent = scenario.description;
+            logsContainer.textContent = scenario.logs;
+
+            document.querySelectorAll('.scenario-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const activeItem = document.querySelectorAll('.scenario-item')[index];
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+
+            displayQuestion();
+            prevBtn.disabled = true;
+            nextBtn.disabled = false;
+            submitBtn.style.display = 'block';
+            submitBtn.disabled = true;
+            scoreDisplay.style.display = 'none';
+            startTimer();
+        }
+
+        // Display current question
+        function displayQuestion() {
+            const scenario = scenarios[currentScenarioIndex];
+            const question = scenario.questions[currentQuestionIndex];
+
+            questionText.textContent = question.question;
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'option';
+                optionEl.textContent = option;
+                optionEl.dataset.index = index;
+                optionsContainer.appendChild(optionEl);
+            });
+
+            selectedOption = null;
+            feedbackEl.style.display = 'none';
+            prevBtn.disabled = currentQuestionIndex === 0;
+            nextBtn.disabled = currentQuestionIndex === scenario.questions.length - 1;
+            submitBtn.style.display = 'block';
+            submitBtn.disabled = true;
+        }
+
+        // Select an option
+        function selectOption(index) {
+            selectedOption = index;
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector(`.option[data-index="${index}"]`).classList.add('selected');
+            submitBtn.disabled = false;
+        }
+
+        // Check the answer
+        function checkAnswer() {
+            if (selectedOption === null) return;
+
+            const scenario = scenarios[currentScenarioIndex];
+            const question = scenario.questions[currentQuestionIndex];
+            const isCorrect = selectedOption === question.correctAnswer;
+
+            feedbackEl.textContent = question.feedback;
+            feedbackEl.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedbackEl.style.display = 'block';
+
+            if (isCorrect) {
+                userScore++;
+            }
+
+            document.querySelectorAll('.option').forEach(option => {
+                option.style.pointerEvents = 'none';
+            });
+
+            submitBtn.style.display = 'none';
+            if (currentQuestionIndex < scenario.questions.length - 1) {
+                nextBtn.disabled = false;
+            } else {
+                showScore();
+            }
+        }
+
+        // Go to next question
+        function goToNextQuestion() {
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        // Go to previous question
+        function goToPreviousQuestion() {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+
+        // Show final score
+        function showScore() {
+            const scenario = scenarios[currentScenarioIndex];
+            const scorePercentage = Math.round((userScore / scenario.questions.length) * 100);
+            scoreEl.textContent = `${userScore}/${scenario.questions.length} (${scorePercentage}%)`;
+            scoreDisplay.style.display = 'block';
+            clearInterval(timerInterval);
+        }
+
+        // Start the timer
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 300;
+            updateTimerDisplay();
+
+            timerInterval = setInterval(function () {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    showScore();
+                }
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerEl.textContent = `Time: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Initialize the app when the page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+
+</html>
